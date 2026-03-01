@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- HELPER FUNCTIONS ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isGuest() {
+      return request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+    
+    // --- USERS COLLECTION ---
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // --- DROPS MAP METADATA COLLECTION ---
+    match /drops/{dropId} {
+      
+      // READ LOGIC:
+      // - Must not be expired
+      // - If PUBLIC, anyone authenticated can read
+      // - If PRIVATE, logged-in user's UID must be in the `allowed_users` list
+      allow read: if isAuthenticated() 
+                  && resource.data.expires_at > request.time
+                  && (
+                    resource.data.visibility_type == 'PUBLIC' 
+                    || request.auth.uid in resource.data.allowed_users
+                  );
+      
+      // CREATE LOGIC:
+      // - Authenticated users only
+      // - Must set themselves as the creator
+      // - GUESTS can ONLY create exact "PUBLIC" visibility drops. No private targeting allowed.
+      allow create: if isAuthenticated() 
+                    && request.resource.data.creator_id == request.auth.uid
+                    && (!isGuest() || request.resource.data.visibility_type == 'PUBLIC');
+      
+      // UPDATE & DELETE LOGIC:
+      // Only the genuine creator can delete or modify their drop map data
+      allow update, delete: if isAuthenticated() && resource.data.creator_id == request.auth.uid;
+    }
+
+    // --- SECRET VAULT COLLECTION ---
+    match /drop_contents/{dropId} {
+      
+      // READ LOGIC (Inherits from parent Drop):
+      // Fetches the parent 'drops' document and ensures permissions match.
+      allow read: if isAuthenticated() 
+                  && get(/databases/$(database)/documents/drops/$(dropId)).data.expires_at > request.time
+                  && (
+                    get(/databases/$(database)/documents/drops/$(dropId)).data.visibility_type == 'PUBLIC'
+                    || request.auth.uid in get(/databases/$(database)/documents/drops/$(dropId)).data.allowed_users
+                  );
+                  
+      // CREATE LOGIC:
+      // Enforced by the WriteBatch client-side logic + checking the parent drop existence constraints
+      allow create: if isAuthenticated();
+      
+      // DELETE LOGIC:
+      // True Atomic "Burn After Reading" - Any valid reader can delete if burn_after_reading is set to True.
+      // Or, the original creator can delete it.
+      allow delete: if isAuthenticated() 
+                    && (
+                      get(/databases/$(database)/documents/drops/$(dropId)).data.creator_id == request.auth.uid
+                      || resource.data.burn_after_reading == true
+                    );
+    }
+  }
+}

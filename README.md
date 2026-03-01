@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ploopp
+
+Ploopp is a geo-location based secret messaging platform that allows users to securely drop encrypted notes tied to physical world coordinates. Using a "Bubble" mechanism, messages can only be discovered and unlocked by other users who physically travel within a 1-kilometer radius of the drop location. It implements Zero-Knowledge security principles to ensure absolute privacy for the content creators.
+
+## Key Features
+
+- Geo-Fenced Discovery: Users can only see and interact with messages located within a strict 1-kilometer physical radius of their current GPS location.
+- Zero-Knowledge Encryption: All secret messages are encrypted strictly on the client side using the Web Crypto API (AES-GCM-256) combined with PBKDF2 key derivation. The server never reads or holds the raw decryption keys.
+- Real-Time Map Radar: Built on top of the `@vis.gl/react-google-maps` library, providing smooth panning, custom markers, and real-time status updates syncing seamlessly with Firebase Firestore.
+- Anonymity Friendly: Allows "Guest Ninjas" to drop open public bubbles without requiring formal account registration.
+- Burn After Reading / Auto-Expire: Messages are architected to vanish completely from the database after a default 24 hours, keeping the map clean and secure.
+
+## Tech Stack
+
+- Framework: Next.js 15+ (App Router)
+- Language: TypeScript
+- Frontend Styling: Tailwind CSS v4 
+- State Management: Zustand 
+- Maps & Geospatial: Google Maps Javascript API, Haversine formula, and Geohashing
+- Backend & Authentication: Firebase (Auth, Firestore)
 
 ## Getting Started
 
-First, run the development server:
+First, install the necessary dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture & Security Notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The project relies on a split-database architecture to uphold its Zero-Knowledge integrity:
+1. `drops` collection: Stores the metadata needed for map indexing (Geohash bounds, coordinates, expiration timestamps, visibility tags).
+2. `drop_contents` collection: Houses the actual encrypted vault securely. The decryption UI handles fetching and decrypting via a client-side password hash verification check.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A single atomic standard is implemented ensuring that metadata and secret vaults always sync synchronously during creation or user-prompted deletion.
