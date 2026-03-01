@@ -7,6 +7,7 @@ export interface UserProfile {
   uid: string;
   username: string;
   is_anonymous: boolean;
+  avatar_url?: string;
   created_at: number; // Unix timestamp
 }
 

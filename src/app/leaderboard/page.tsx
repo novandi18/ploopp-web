@@ -7,6 +7,7 @@ import { useLocation } from '@/hooks/useLocation';
 import { ShieldAlert, Trophy, MapPin, Globe, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Avatar from '@/components/Avatar';
 
 export default function LeaderboardPage() {
   const { user, loading: authLoading } = useAuthStore();
@@ -118,9 +119,13 @@ export default function LeaderboardPage() {
           {top3[1] && (
             <div className={`flex flex-col items-center w-1/3 min-w-0 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
               <div className="relative mb-2 mt-4 transition-transform hover:-translate-y-1">
-                <div className="w-16 h-16 rounded-full bg-surface border-4 border-slate-300 shadow-lg flex items-center justify-center overflow-hidden">
-                  <span className="text-xl font-black text-slate-400">{top3[1].username.substring(0,2).toUpperCase()}</span>
-                </div>
+                <Avatar 
+                  uid={top3[1].uid} 
+                  url={top3[1].avatar_url} 
+                  alt={top3[1].username} 
+                  sizeClassName="w-16 h-16" 
+                  className="bg-surface border-4 border-slate-300 shadow-lg" 
+                />
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-slate-300 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-md border-2 border-surface">2</div>
               </div>
               <div className="h-24 w-full bg-slate-100 rounded-t-3xl border border-slate-200 flex flex-col justify-start items-center pt-4">
@@ -135,9 +140,13 @@ export default function LeaderboardPage() {
             <div className={`flex flex-col items-center w-1/3 min-w-0 z-10 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
               <div className="relative mb-2 transition-transform hover:-translate-y-2">
                 <Trophy className="absolute -top-8 left-1/2 -translate-x-1/2 w-8 h-8 text-accent drop-shadow-md z-10" fill="currentColor" />
-                <div className="w-20 h-20 rounded-full bg-surface border-4 border-accent shadow-xl flex items-center justify-center overflow-hidden z-0">
-                  <span className="text-2xl font-black text-accent">{top3[0].username.substring(0,2).toUpperCase()}</span>
-                </div>
+                <Avatar 
+                  uid={top3[0].uid} 
+                  url={top3[0].avatar_url} 
+                  alt={top3[0].username} 
+                  sizeClassName="w-20 h-20" 
+                  className="bg-surface border-4 border-accent shadow-xl z-0" 
+                />
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2 border-surface">1</div>
               </div>
               <div className="h-32 w-full bg-gradient-to-t from-accent/10 to-accent/20 rounded-t-[2rem] border-x border-t border-accent/30 shadow-[0_-5px_15px_rgba(251,191,36,0.2)] flex flex-col justify-start items-center pt-4 px-1">
@@ -151,9 +160,13 @@ export default function LeaderboardPage() {
           {top3[2] && (
             <div className={`flex flex-col items-center w-1/3 min-w-0 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
               <div className="relative mb-2 mt-8 transition-transform hover:-translate-y-1">
-                <div className="w-14 h-14 rounded-full bg-surface border-4 border-orange-300 shadow-lg flex items-center justify-center overflow-hidden">
-                  <span className="text-lg font-black text-orange-400">{top3[2].username.substring(0,2).toUpperCase()}</span>
-                </div>
+                <Avatar 
+                  uid={top3[2].uid} 
+                  url={top3[2].avatar_url} 
+                  alt={top3[2].username} 
+                  sizeClassName="w-14 h-14" 
+                  className="bg-surface border-4 border-orange-300 shadow-lg" 
+                />
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-orange-300 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-md border-2 border-surface">3</div>
               </div>
               <div className="h-20 w-full bg-orange-50 rounded-t-3xl border border-orange-100 flex flex-col justify-start items-center pt-3">
@@ -185,9 +198,13 @@ export default function LeaderboardPage() {
               >
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                   <div className="w-6 sm:w-8 flex-shrink-0 flex justify-center text-lg font-black text-foreground/40">{idx + 4}</div>
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-inner">
-                    {p.username.substring(0,2).toUpperCase()}
-                  </div>
+                  <Avatar 
+                    uid={p.uid} 
+                    url={p.avatar_url} 
+                    alt={p.username} 
+                    sizeClassName="w-10 h-10 sm:w-12 sm:h-12" 
+                    className="shadow-inner" 
+                  />
                   <div className="min-w-0 flex-1">
                     <h3 className="font-bold text-foreground text-sm truncate">{p.username}</h3>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-primary truncate block">{p.rank_tier}</span>
@@ -229,9 +246,13 @@ export default function LeaderboardPage() {
             <div className="bg-surface rounded-[24px] p-5 shadow-[0_10px_30px_rgba(56,189,248,0.2)] border-2 border-primary/30 animate-in slide-in-from-bottom-10 duration-500">
               <div className="flex justify-between items-end mb-3">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 bg-primary text-white rounded-full flex items-center justify-center font-black text-lg sm:text-xl shadow-inner">
-                    {user.email ? user.email.substring(0,1).toUpperCase() : 'U'}
-                  </div>
+                  <Avatar 
+                    uid={user.uid} 
+                    url={myRank?.avatar_url} 
+                    alt={user.email || 'You'} 
+                    sizeClassName="w-10 h-10 sm:w-12 sm:h-12" 
+                    className="shadow-inner" 
+                  />
                   <div className="min-w-0">
                     <div className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest truncate">My Rank</div>
                     <div className="font-black text-foreground text-base sm:text-lg truncate">

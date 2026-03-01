@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/services/authStore';
-import { getUserRank, LeaderboardEntry, updateUsername } from '@/services/gamificationRepository';
+import { getUserRank, LeaderboardEntry, updateUsername, updateAvatar } from '@/services/gamificationRepository';
 import Link from 'next/link';
-import { Edit2, CheckCircle2 } from 'lucide-react';
+import { Edit2, CheckCircle2, Camera } from 'lucide-react';
+import Avatar from '@/components/Avatar';
+import AvatarPicker from '@/components/AvatarPicker';
 
 export default function ProfilePage() {
   const { user, loading } = useAuthStore();
@@ -15,6 +17,10 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [savingName, setSavingName] = useState(false);
+
+  // Avatar Picking State
+  const [isPickingAvatar, setIsPickingAvatar] = useState(false);
+  const [updatingAvatar, setUpdatingAvatar] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -46,6 +52,20 @@ export default function ProfilePage() {
     }
   };
 
+  const handleUpdateAvatar = async (url: string) => {
+    if (!user || user.isAnonymous) return;
+    setUpdatingAvatar(true);
+    try {
+      await updateAvatar(user.uid, url);
+      setRank(prev => prev ? { ...prev, avatar_url: url } : prev);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdatingAvatar(false);
+      setIsPickingAvatar(false);
+    }
+  };
+
   if (loading || fetching) return <div className="p-8 text-center">Loading...</div>;
 
   const isGuest = user?.isAnonymous || !user;
@@ -68,6 +88,27 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Avatar Section */}
+            <div className="flex flex-col items-center mb-6">
+              <div 
+                className="relative group cursor-pointer" 
+                onClick={() => setIsPickingAvatar(true)}
+                title="Change Avatar"
+              >
+                <Avatar 
+                  uid={user.uid} 
+                  url={rank?.avatar_url} 
+                  sizeClassName="w-32 h-32 text-4xl" 
+                  alt={rank?.username || 'User'} 
+                  className={`border-4 border-background shadow-lg transition-transform hover:scale-105 ${updatingAvatar ? "opacity-50" : ""}`}
+                />
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="text-white w-8 h-8" />
+                </div>
+              </div>
+              {updatingAvatar && <p className="text-sm text-muted-foreground mt-2 animate-pulse">Updating...</p>}
+            </div>
+
             {/* Username Section */}
             <div className="bg-surface p-6 rounded-2xl border border-primary/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
@@ -130,6 +171,15 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+        )}
+        
+        {isPickingAvatar && user && (
+          <AvatarPicker 
+            uid={user.uid}
+            currentAvatar={rank?.avatar_url}
+            onSelect={handleUpdateAvatar}
+            onClose={() => setIsPickingAvatar(false)}
+          />
         )}
       </div>
     </div>

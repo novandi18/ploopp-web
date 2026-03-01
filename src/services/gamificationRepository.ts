@@ -18,6 +18,7 @@ import {
 export interface LeaderboardEntry {
   uid: string;
   username: string;
+  avatar_url?: string;
   total_points: number;
   rank_tier: string;
   last_updated: Timestamp | FieldValue;
@@ -122,4 +123,16 @@ export async function getUserRank(userId: string): Promise<LeaderboardEntry | nu
     return snap.data() as LeaderboardEntry;
   }
   return null;
+}
+
+export async function updateAvatar(userId: string, targetUrl: string) {
+  if (!userId) return;
+  const userRef = doc(db, 'users', userId);
+  const leaderRef = doc(db, 'leaderboards', userId);
+
+  const batch = writeBatch(db);
+  batch.set(userRef, { avatar_url: targetUrl }, { merge: true });
+  batch.set(leaderRef, { avatar_url: targetUrl }, { merge: true });
+  
+  await batch.commit();
 }
