@@ -1,8 +1,8 @@
 # ──────────────────────────────────────────────────────────────
 # Ploopp Web — CI / CD Pipeline
-# Next.js 16 (static export) → Firebase Hosting
+# Next.js 16 (static export) — Build Only
 # ──────────────────────────────────────────────────────────────
-name: Deploy to Firebase Hosting
+name: Build Ploopp Web
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
     branches: [master]
 
 jobs:
-  build_and_deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,21 +42,10 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
 
-      # ── 5a. Deploy LIVE (push to master) ───────────────────
-      - name: Deploy to Firebase Hosting (Live)
-        if: github.event_name == 'push'
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      # ── 5. Upload build artifact ───────────────────────────
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PLOOPP }}
-          channelId: live
-          projectId: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-
-      # ── 5b. Deploy PREVIEW (pull request to master) ────────
-      - name: Deploy to Firebase Hosting (Preview)
-        if: github.event_name == 'pull_request'
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PLOOPP }}
-          projectId: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          name: ploopp-web-out
+          path: out/
+          retention-days: 7
