@@ -139,6 +139,9 @@ export default function Home() {
       };
 
       await createDrop(dropMetadata, vault);
+      import('@/services/gamificationRepository').then(({ handleDropCreated }) => {
+        handleDropCreated(user.uid, user.isAnonymous);
+      }).catch(err => console.error(err));
       setGenerateMsg('Bubble dropped successfully!');
       
       // Reset fields upon success
@@ -198,7 +201,6 @@ export default function Home() {
   if (user) {
     return (
       <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
-        <Navbar />
         <main className="container mx-auto px-4 py-8 max-w-5xl">
           <div className="bg-surface p-8 rounded-[2rem] space-y-6 shadow-[0_10px_40px_rgb(56,189,248,0.1)] border border-primary/5 transition-all">
             

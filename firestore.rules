@@ -17,6 +17,13 @@ service cloud.firestore {
       allow write: if isAuthenticated() && request.auth.uid == userId;
     }
 
+    // --- LEADERBOARDS COLLECTION ---
+    match /leaderboards/{userId} {
+      allow read: if isAuthenticated();
+      // Only write if authenticated user is NOT a guest, and they can only update their own doc
+      allow write: if isAuthenticated() && !isGuest() && request.auth.uid == userId;
+    }
+
     // --- DROPS MAP METADATA COLLECTION ---
     match /drops/{dropId} {
       

@@ -38,6 +38,13 @@ export default function BubbleVaultModal({ drop, onClose, onDeleted }: BubbleVau
           if (!drop.requires_password) {
             const dec = await decryptData(content.encrypted_data, "ploopp_default_public_vault_key");
             setDecryptedMessage(dec);
+            
+            // Only non-owners finding a drop grants points
+            if (user && user.uid !== drop.creator_id) {
+              import('@/services/gamificationRepository').then(({ handleDropFound }) => {
+                handleDropFound(user.uid, user.isAnonymous, drop.creator_id);
+              }).catch(err => console.error(err));
+            }
           }
         } else {
           setErrorText('Vault not found or has been burned.');
@@ -66,6 +73,13 @@ export default function BubbleVaultModal({ drop, onClose, onDeleted }: BubbleVau
       // 2. Actually Decrypt the data
       const message = await decryptData(vaultInfo.encrypted_data, passwordInput);
       setDecryptedMessage(message);
+
+      // Only non-owners finding a drop grants points
+      if (user && user.uid !== drop.creator_id) {
+        import('@/services/gamificationRepository').then(({ handleDropFound }) => {
+          handleDropFound(user.uid, user.isAnonymous, drop.creator_id);
+        }).catch(err => console.error(err));
+      }
     } catch (err) {
       setErrorText("Decryption failed. The bubble remains solid.");
     }

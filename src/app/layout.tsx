@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import AuthLayout from "@/components/AuthLayout";
+import Navbar from "@/components/Navbar";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased selection:bg-primary selection:text-white`}>
-        <AuthLayout>{children}</AuthLayout>
+        <AuthLayout>
+          <Navbar />
+          {children}
+        </AuthLayout>
       </body>
     </html>
   );

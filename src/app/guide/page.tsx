@@ -1,13 +1,11 @@
 "use client";
 
-import Navbar from '@/components/Navbar';
 import { Sparkles, MapPin, Lock, Unlock, EyeOff, Navigation, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function GuidePage() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
-      <Navbar />
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="bg-surface p-8 sm:p-12 rounded-[2.5rem] shadow-[0_10px_40px_rgb(56,189,248,0.1)] border border-primary/5">
           
