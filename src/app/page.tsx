@@ -11,8 +11,10 @@ import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signIn
 import { auth } from '@/lib/firebase';
 import { Coordinates, Drop } from '@/types';
 import { createDrop, getNearbyDrops } from '@/services/dropRepository';
+import { getCachedDrops, cacheDrops } from '@/services/dropCache';
 import { encryptData, hashPassword } from '@/lib/cryptoUtils';
 import geohash from 'ngeohash';
+import { MapConfiguration } from '@/lib/MapConfiguration';
 
 // Haversine formula to calculate the exact distance between two coordinates in Kilometers
 function calculateDistanceInKM(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -52,11 +54,23 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true;
     
-    async function fetchDrops() {
+    async function fetchDrops(forceRefresh = false) {
       if (!location.coords) return;
+
+      const currentGeohash7 = geohash.encode(location.coords.latitude, location.coords.longitude, MapConfiguration.CACHE_GEOHASH_PRECISION);
+
+      if (!forceRefresh) {
+        // Check local cache first
+        const cached = await getCachedDrops(currentGeohash7);
+        if (cached && isMounted) {
+          setNearbyDrops(cached);
+          return;
+        }
+      }
+
       // Precision 5 is roughly a 4.9km x 4.9km grid cell.
       // By taking this cell and its 8 surroundings, it ensures we comfortably cover at least a 1 KM radius circle everywhere.
-      const myHash = geohash.encode(location.coords.latitude, location.coords.longitude, 5);
+      const myHash = geohash.encode(location.coords.latitude, location.coords.longitude, MapConfiguration.GEOHASH_PRECISION);
       const neighbors = geohash.neighbors(myHash);
       const allHashes = [myHash, ...neighbors];
       
@@ -75,7 +89,11 @@ export default function Home() {
           return distance <= RADIUS_KM;
         });
 
-        if (isMounted) setNearbyDrops(validDropsWithinRadius);
+        if (isMounted) {
+          setNearbyDrops(validDropsWithinRadius);
+          // Cache the result for this specific 7-char geohash area
+          await cacheDrops(currentGeohash7, validDropsWithinRadius);
+        }
       } catch (error) {
         console.error("Failed to fetch drops", error);
       }
@@ -83,8 +101,9 @@ export default function Home() {
 
     if (user && location.coords) {
       fetchDrops();
-      // Poll every 10 seconds to find new bubbles
-      const interval = setInterval(fetchDrops, 10000);
+      // Polling every 10 seconds continues, but it will hit Cache instead of Firestore
+      // unless user moves out of the geohash or cache expires/not found.
+      const interval = setInterval(() => fetchDrops(false), 10000);
       return () => { isMounted = false; clearInterval(interval); };
     }
   }, [location.coords, user]);
@@ -138,12 +157,18 @@ export default function Home() {
         content_type: "text" as const,
       };
 
-      await createDrop(dropMetadata, vault);
+      const newDropId = await createDrop(dropMetadata, vault);
       import('@/services/gamificationRepository').then(({ handleDropCreated }) => {
         handleDropCreated(user.uid, user.isAnonymous);
       }).catch(err => console.error(err));
       setGenerateMsg('Bubble dropped successfully!');
       
+      // Optimistically add the new bubble to the local state (Zero cost!)
+      setNearbyDrops(prev => [...prev, {
+        ...dropMetadata,
+        drop_id: newDropId,
+      } as Drop]);
+
       // Reset fields upon success
       setSecretMessage('');
       setDropPassword('');

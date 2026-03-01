@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import geohash from 'ngeohash';
+import { shouldRefreshMap } from '@/lib/MapConfiguration';
 
 export interface Coordinates {
   latitude: number;
@@ -21,6 +22,9 @@ export function useLocation(): LocationState {
     loading: true,
   });
 
+  // Keep track of the last emitted coordinates for throttling
+  const lastCoordsRef = useRef<Coordinates | null>(null);
+
   useEffect(() => {
     if (typeof window === 'undefined' || !('geolocation' in navigator)) {
       const timeout = setTimeout(() => {
@@ -38,6 +42,12 @@ export function useLocation(): LocationState {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       };
+
+      // Throttling: Return early if displacement is less than threshold
+      if (lastCoordsRef.current && !shouldRefreshMap(coords, lastCoordsRef.current)) {
+        return;
+      }
+      lastCoordsRef.current = coords;
 
       setState({
         coords,

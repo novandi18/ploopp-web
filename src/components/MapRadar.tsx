@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { APIProvider, Map, AdvancedMarker, MapMouseEvent, Pin } from '@vis.gl/react-google-maps';
+import React, { useEffect, useState } from 'react';
+import { APIProvider, Map as GoogleMap, AdvancedMarker, MapMouseEvent, Pin } from '@vis.gl/react-google-maps';
 import { Coordinates, Drop } from '@/types';
 import { Navigation, MapPin, Maximize, Minimize, Layers } from 'lucide-react';
+import { MapConfiguration } from '@/lib/MapConfiguration';
 
 interface MapRadarProps {
   userLocation: Coordinates | null;
@@ -13,7 +14,7 @@ interface MapRadarProps {
   onDropClick?: (drop: Drop) => void;
 }
 
-export default function MapRadar({ userLocation, selectedLocation, onLocationSelect, drops = [], onDropClick }: MapRadarProps) {
+const MapRadar = React.memo(function MapRadar({ userLocation, selectedLocation, onLocationSelect, drops = [], onDropClick }: MapRadarProps) {
   const [apiKey, setApiKey] = useState<string | undefined>(undefined);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -69,13 +70,13 @@ export default function MapRadar({ userLocation, selectedLocation, onLocationSel
   return (
     <div className={containerClasses}>
       <APIProvider apiKey={apiKey}>
-        <Map
+        <GoogleMap
           defaultZoom={16}
           defaultCenter={defaultCenter}
           center={mapCenter}
           onCameraChanged={(ev) => setMapCenter(ev.detail.center)} // Keep track of manual dragging so we don't snap back improperly
           onClick={handleMapClick}
-          mapId="PLOOOP_MAIN_MAP"
+          mapId={MapConfiguration.MAP_ID}
           disableDefaultUI={true}
           gestureHandling="greedy" // Allows zooming and panning easily
           mapTypeId={mapTypeId}
@@ -116,7 +117,7 @@ export default function MapRadar({ userLocation, selectedLocation, onLocationSel
               />
             </AdvancedMarker>
           ))}
-        </Map>
+        </GoogleMap>
       </APIProvider>
       
       {/* Map Control Buttons (Absolute Overlay) */}
@@ -150,4 +151,6 @@ export default function MapRadar({ userLocation, selectedLocation, onLocationSel
       )}
     </div>
   );
-}
+});
+
+export default MapRadar;
