@@ -116,7 +116,7 @@ export default function LeaderboardPage() {
         <div className="pt-8 pb-10 px-4 flex items-end justify-center gap-2 sm:gap-4 animate-in fade-in zoom-in-95 duration-500">
           {/* Rank 2 */}
           {top3[1] && (
-            <div className={`flex flex-col items-center w-1/3 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
+            <div className={`flex flex-col items-center w-1/3 min-w-0 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
               <div className="relative mb-2 mt-4 transition-transform hover:-translate-y-1">
                 <div className="w-16 h-16 rounded-full bg-surface border-4 border-slate-300 shadow-lg flex items-center justify-center overflow-hidden">
                   <span className="text-xl font-black text-slate-400">{top3[1].username.substring(0,2).toUpperCase()}</span>
@@ -132,7 +132,7 @@ export default function LeaderboardPage() {
           
           {/* Rank 1 */}
           {top3[0] && (
-            <div className={`flex flex-col items-center w-1/3 z-10 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
+            <div className={`flex flex-col items-center w-1/3 min-w-0 z-10 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
               <div className="relative mb-2 transition-transform hover:-translate-y-2">
                 <Trophy className="absolute -top-8 left-1/2 -translate-x-1/2 w-8 h-8 text-accent drop-shadow-md z-10" fill="currentColor" />
                 <div className="w-20 h-20 rounded-full bg-surface border-4 border-accent shadow-xl flex items-center justify-center overflow-hidden z-0">
@@ -140,16 +140,16 @@ export default function LeaderboardPage() {
                 </div>
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md border-2 border-surface">1</div>
               </div>
-              <div className="h-32 w-full bg-gradient-to-t from-accent/10 to-accent/20 rounded-t-[2rem] border-x border-t border-accent/30 shadow-[0_-5px_15px_rgba(251,191,36,0.2)] flex flex-col justify-start items-center pt-4">
+              <div className="h-32 w-full bg-gradient-to-t from-accent/10 to-accent/20 rounded-t-[2rem] border-x border-t border-accent/30 shadow-[0_-5px_15px_rgba(251,191,36,0.2)] flex flex-col justify-start items-center pt-4 px-1">
                 <span className="text-secondary font-black text-lg">{top3[0].total_points}</span>
-                <span className="text-xs text-foreground uppercase font-black">{top3[0].username}</span>
+                <span className="text-xs text-foreground uppercase font-black w-full text-center truncate">{top3[0].username}</span>
               </div>
             </div>
           )}
 
           {/* Rank 3 */}
           {top3[2] && (
-            <div className={`flex flex-col items-center w-1/3 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
+            <div className={`flex flex-col items-center w-1/3 min-w-0 ${isGuest ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleRowClick}>
               <div className="relative mb-2 mt-8 transition-transform hover:-translate-y-1">
                 <div className="w-14 h-14 rounded-full bg-surface border-4 border-orange-300 shadow-lg flex items-center justify-center overflow-hidden">
                   <span className="text-lg font-black text-orange-400">{top3[2].username.substring(0,2).toUpperCase()}</span>
@@ -183,17 +183,17 @@ export default function LeaderboardPage() {
                 onClick={handleRowClick}
                 className={`flex items-center justify-between p-4 bg-surface rounded-[24px] shadow-[0_4px_15px_rgba(0,0,0,0.03)] border-2 border-transparent hover:border-primary/20 transition-all ${isGuest ? 'cursor-pointer' : 'cursor-default'} transform hover:-translate-y-0.5`}
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-8 flex justify-center text-lg font-black text-foreground/40">{idx + 4}</div>
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-inner">
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                  <div className="w-6 sm:w-8 flex-shrink-0 flex justify-center text-lg font-black text-foreground/40">{idx + 4}</div>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-inner">
                     {p.username.substring(0,2).toUpperCase()}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-sm">{p.username}</h3>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{p.rank_tier}</span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-bold text-foreground text-sm truncate">{p.username}</h3>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary truncate block">{p.rank_tier}</span>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex-shrink-0 ml-2">
                   <div className="text-lg font-black text-secondary">{p.total_points}</div>
                   <div className="text-[10px] text-muted-foreground font-medium uppercase">pts</div>
                 </div>
@@ -212,14 +212,14 @@ export default function LeaderboardPage() {
         <div className="max-w-lg mx-auto pointer-events-auto">
           {isGuest ? (
             /* Guest Sticky Bar CTA */
-            <div className="bg-surface rounded-[24px] p-5 shadow-[0_10px_30px_rgba(251,146,60,0.2)] border-2 border-secondary/30 flex items-center justify-between animate-in slide-in-from-bottom-10 duration-700 spring">
-              <div>
-                <h4 className="font-extrabold text-foreground text-lg">Join the Race!</h4>
-                <p className="text-xs text-muted-foreground">Log in to start earning points.</p>
+            <div className="bg-surface rounded-[24px] p-4 sm:p-5 shadow-[0_10px_30px_rgba(251,146,60,0.2)] border-2 border-secondary/30 flex items-center justify-between animate-in slide-in-from-bottom-10 duration-700 spring">
+              <div className="min-w-0 pr-2">
+                <h4 className="font-extrabold text-foreground text-base sm:text-lg truncate">Join the Race!</h4>
+                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">Log in to start earning points.</p>
               </div>
               <Link 
                 href="/?auth=true" 
-                className="bg-secondary text-white px-5 py-3 rounded-2xl font-bold flex items-center gap-1 hover:bg-secondary-hover hover:scale-105 active:scale-95 transition-all shadow-md animate-bounce [animation-duration:2s]"
+                className="bg-secondary text-white px-4 py-2 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl font-bold flex items-center gap-1 hover:bg-secondary-hover hover:scale-105 active:scale-95 transition-all shadow-md animate-bounce [animation-duration:2s] whitespace-nowrap text-sm sm:text-base flex-shrink-0 ml-3"
               >
                 Sign Up <ChevronRight className="w-4 h-4" />
               </Link>
@@ -228,20 +228,20 @@ export default function LeaderboardPage() {
             /* Auth Sticky Profile Bar */
             <div className="bg-surface rounded-[24px] p-5 shadow-[0_10px_30px_rgba(56,189,248,0.2)] border-2 border-primary/30 animate-in slide-in-from-bottom-10 duration-500">
               <div className="flex justify-between items-end mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-black text-xl shadow-inner">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 bg-primary text-white rounded-full flex items-center justify-center font-black text-lg sm:text-xl shadow-inner">
                     {user.email ? user.email.substring(0,1).toUpperCase() : 'U'}
                   </div>
-                  <div>
-                    <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">My Rank</div>
-                    <div className="font-black text-foreground text-lg">
+                  <div className="min-w-0">
+                    <div className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest truncate">My Rank</div>
+                    <div className="font-black text-foreground text-base sm:text-lg truncate">
                       {myRankPosition > 0 ? `#${myRankPosition}` : 'Unranked'}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-3xl font-black text-primary leading-none">{myRank?.total_points || 0}</div>
-                  <div className="text-[10px] uppercase font-bold text-muted-foreground mt-1">Total Points</div>
+                <div className="text-right flex-shrink-0 ml-2">
+                  <div className="text-2xl sm:text-3xl font-black text-primary leading-none">{myRank?.total_points || 0}</div>
+                  <div className="text-[10px] uppercase font-bold text-muted-foreground mt-1 whitespace-nowrap">Total Points</div>
                 </div>
               </div>
               

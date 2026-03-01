@@ -32,28 +32,28 @@ export default function Navbar() {
 
   const getProfileClasses = () => {
     const isActive = pathname === '/profile';
-    const base = "flex items-center space-x-2 text-sm font-medium px-4 py-2 rounded-full hidden sm:flex border shadow-sm transition-colors cursor-pointer";
+    const base = "flex items-center space-x-2 text-sm font-medium p-2 sm:px-4 sm:py-2 rounded-full border shadow-sm transition-colors cursor-pointer group";
     return isActive
       ? `${base} border-primary bg-primary/10 text-primary`
       : `${base} border-foreground/5 bg-background text-foreground/70 hover:bg-primary/5`;
   };
 
   return (
-    <nav className="w-full bg-surface shadow-[0_4px_20px_rgb(0,0,0,0.05)] p-4 flex justify-between items-center sticky top-0 z-50">
+    <nav className="w-full bg-surface shadow-[0_4px_20px_rgb(0,0,0,0.05)] p-3 sm:p-4 flex flex-wrap justify-between items-center sticky top-0 z-50 gap-y-2">
       <Link href="/" className="flex items-center space-x-2 text-primary cursor-pointer hover:scale-105 transition-transform duration-300 ease-out">
         <Droplet className="h-8 w-8" strokeWidth={2.5} />
-        <span className="font-extrabold text-2xl tracking-tight hidden md:inline">Ploopp</span>
+        <span className="font-extrabold text-2xl tracking-tight hidden sm:inline">Ploopp</span>
       </Link>
       
       {user && (
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
           <Link
             href="/"
             className={getLinkClasses('/')}
             title="Explore"
           >
             <Compass className="h-5 w-5 sm:mr-2" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Explore</span>
+            <span className="hidden lg:inline">Explore</span>
           </Link>
 
           <Link
@@ -62,7 +62,7 @@ export default function Navbar() {
             title="Leaderboard"
           >
             <Trophy className="h-5 w-5 sm:mr-2" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Rank</span>
+            <span className="hidden lg:inline">Rank</span>
           </Link>
           
           <Link
@@ -71,12 +71,12 @@ export default function Navbar() {
             title="Overview"
           >
             <BookOpen className="h-5 w-5 sm:mr-2" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Guide</span>
+            <span className="hidden lg:inline">Guide</span>
           </Link>
           
-          <Link href="/profile" className={getProfileClasses()}>
+          <Link href="/profile" className={getProfileClasses()} title="Profile">
             <UserIcon className="h-5 w-5 text-secondary" strokeWidth={2.5} />
-            <span>{user.isAnonymous ? 'Guest' : user.email?.split('@')[0]}</span>
+            <span className="hidden sm:inline">{user.isAnonymous ? 'Guest' : user.email?.split('@')[0]}</span>
           </Link>
           <button 
             onClick={handleLogout}
@@ -84,7 +84,7 @@ export default function Navbar() {
             aria-label="Log Out"
           >
             <LogOut className="h-5 w-5 sm:group-hover:mr-1 transition-all" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Pop Out</span>
+            <span className="hidden lg:inline">Pop Out</span>
           </button>
         </div>
       )}
