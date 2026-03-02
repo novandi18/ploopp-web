@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Coordinates, Drop } from '@/types';
-import { createDrop, getNearbyDrops } from '@/services/dropRepository';
+import { createDrop, getNearbyDrops, canGuestDrop } from '@/services/dropRepository';
 import { getCachedDrops, cacheDrops } from '@/services/dropCache';
 import { encryptData, hashPassword } from '@/lib/cryptoUtils';
 import geohash from 'ngeohash';
@@ -123,6 +123,26 @@ export default function Home() {
     }
 
     setIsGenerating(true);
+    setGenerateMsg('Checking permissions...');
+
+    if (user.isAnonymous) {
+      try {
+        const canDrop = await canGuestDrop(user.uid);
+        if (!canDrop) {
+          setGenerateMsg('Guest limit reached! Sign up to drop more bubbles (Max 2 per day).');
+          setIsGenerating(false);
+          setTimeout(() => setGenerateMsg(''), 4000);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to check guest limit', err);
+        setGenerateMsg('Verification failed, please try again.');
+        setIsGenerating(false);
+        setTimeout(() => setGenerateMsg(''), 3000);
+        return;
+      }
+    }
+
     setGenerateMsg('Encrypting secret bubble...');
     
     try {

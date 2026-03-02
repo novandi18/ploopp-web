@@ -133,3 +133,31 @@ export async function deleteDrop(dropId: string): Promise<void> {
   batch.delete(doc(db, 'drop_contents', dropId));
   await batch.commit();
 }
+
+/**
+ * Checks if a guest user has exceeded their daily drop limit (max 2 per day).
+ */
+export async function canGuestDrop(userId: string): Promise<boolean> {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const startOfDayMillis = startOfDay.getTime();
+
+  const dropsRef = collection(db, 'drops');
+  const q = query(
+    dropsRef,
+    where('creator_id', '==', userId)
+  );
+
+  const querySnapshot = await getDocs(q);
+  
+  let todayDropsCount = 0;
+  for (const docSnap of querySnapshot.docs) {
+    const data = docSnap.data();
+    const createdAt = data.created_at?.toMillis() || 0;
+    if (createdAt >= startOfDayMillis) {
+      todayDropsCount++;
+    }
+  }
+
+  return todayDropsCount < 2;
+}
